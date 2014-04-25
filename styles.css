@@ -1,5 +1,24 @@
 /* your beautiful css styling goes here! */
 
-/* Note: an asteroid image is included in this repo. 
+/* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */
 
+body {
+  background: black;
+  /*position: relative;*/
+  /*width: 1000px;*/
+  /*height: 1000px;*/
+}
+
+.scoreboard {
+  color: white;
+}
+
+.gameboard {
+  background: white;
+  width: 800px;
+  height: 800px;
+  position: absolute;
+  margin: auto;
+  top: 0; right: 0; bottom: 0; left: 0;
+}
