@@ -6,6 +6,7 @@ var svg = d3.select('body').append('svg')
 
 var boardWidth = 800;
 var boardHeight = 800;
+var numEnemies = 15;
 
 
 var Circle = function(x, y) {
@@ -30,7 +31,7 @@ Circle.prototype.randomMove = function(){
 var playerData = [Circle(boardWidth / 2, boardHeight / 2)];
 
 var players = svg.selectAll('circle.player')
-                  .data(playerData);
+                 .data(playerData);
 
 players.enter().append('circle')
   .style('fill', 'blue')
@@ -43,13 +44,13 @@ players.enter().append('circle')
 
 var enemyData = [];
 
-for (var i = 0; i < 15; i++){
+for (var i = 0; i < numEnemies; i++){
   enemyData.push(Circle());
 }
 
 var enemies = svg.selectAll('circle.enemy')
                 .data(enemyData);
-debugger;
+
 enemies.enter().append('circle');
 
 enemies
@@ -67,7 +68,7 @@ var update = function(data){
     .data(data);
 
   enemies
-  .transition().duration(1000)
+  .transition().duration(1500)
   .attr('cx', function(d){
     d.randomMove();
     return d.cx;
@@ -80,3 +81,7 @@ setInterval(function() {
 }, 1000);
 
 
+d3.select('svg').on('mousemove', function() {
+  var coordinates = d3.mouse(this);
+  players.attr('cx', coordinates[0]).attr('cy', coordinates[1]);
+});
