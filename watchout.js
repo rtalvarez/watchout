@@ -4,10 +4,18 @@ var svg = d3.select('body').append('svg')
   .attr('class', 'gameboard')
   .append('g');
 
+var highScore = 0;
+var currentScore = 0;
+
 var boardWidth = 800;
 var boardHeight = 800;
 var numEnemies = 15;
+var collisions = 0;
 
+var throttled = _.throttle(function(){
+  collisions++;
+  d3.select('.collisions span').text(collisions);
+}, 1000, { trailing: false });
 
 var Circle = function(x, y) {
   var instance = Object.create(Circle.prototype);
@@ -66,9 +74,9 @@ var update = function(data){
 //debugger;
   var enemies = svg.selectAll('circle.enemy')
     .data(data);
-
+  // console.log(enemies.attr)
   enemies
-  .transition().duration(1500)
+  .transition().duration(3000)
   .attr('cx', function(d){
     d.randomMove();
     return d.cx;
@@ -78,10 +86,53 @@ var update = function(data){
 
 setInterval(function() {
   update(enemyData);
-}, 1000);
+}, 3000);
 
+setInterval(function() {
+  currentScore += 1;
+  // console.log([d3.event.x, d3.event.y]);
+  d3.select('.current span').text(currentScore);
+
+  // position of the player
+  var coordinates = [playerData[0].cx, playerData[0].cy];
+  // console.log(coordinates);
+  var diameter = enemyData[0].diameter;
+
+  for (var i = 0; i < enemyData.length; i++){
+    var enemyCx = enemyData[i].cx;
+    var enemyCy = enemyData[i].cy;
+    // console.log(enemyCx, enemyCy);
+
+    // xOverlap = coordinates[0] >= enemyCx - diameter && coordinates[0] <= enemyCx + diameter;
+    // yOverlap = coordinates[1] >= enemyCy - diameter && coordinates[1] <= enemyCy + diameter;
+    if (getDistance(enemyCx, enemyCy, coordinates[0], coordinates[1]) < diameter){
+      console.log('collision detected', xOverlap, yOverlap);
+      console.log('player coordinates', coordinates);
+      console.log('enemy coordinates', [enemyCx, enemyCy]);
+      if(currentScore > highScore) {
+        highScore = currentScore;
+        d3.select('.high span').text(highScore);
+      }
+      d3.select('.current span').text(currentScore);
+      currentScore = 0;
+      throttled();
+    }
+  }
+}, 15);
+
+var getDistance = function(firstX, firstY, secondX, secondY) {
+  return Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
+};
 
 d3.select('svg').on('mousemove', function() {
+  // console.log(d3.mouse(this));
+  // console.dir(this);
+  // window.coord = [d3.event.x, d3.event.y];
   var coordinates = d3.mouse(this);
+  // console.log(coordinates);
+  playerData[0].cx = coordinates[0];
+  playerData[0].cy = coordinates[1];
+
+
   players.attr('cx', coordinates[0]).attr('cy', coordinates[1]);
 });
